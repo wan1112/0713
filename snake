@@ -1,0 +1,142 @@
+Sure! Here's a simple Python snake game code:
+
+```python
+import pygame
+import time
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Set colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+
+# Set window dimensions
+window_width = 800
+window_height = 600
+
+# Set snake block size and speed
+block_size = 20
+snake_speed = 15
+
+# Set fonts
+font_style = pygame.font.SysFont(None, 50)
+score_font = pygame.font.SysFont(None, 35)
+
+
+def display_score(score):
+    value = score_font.render("Score: " + str(score), True, BLACK)
+    game_window.blit(value, [10, 10])
+
+
+def draw_snake(block_size, snake_list):
+    for x in snake_list:
+        pygame.draw.rect(game_window, GREEN, [x[0], x[1], block_size, block_size])
+
+
+def game_loop():
+    game_over = False
+    game_close = False
+
+    # Initialize snake starting position and movement
+    x1 = window_width / 2
+    y1 = window_height / 2
+    x1_change = 0
+    y1_change = 0
+
+    # Create initial snake body
+    snake_list = []
+    length_of_snake = 1
+
+    # Create random food position
+    food_x = round(random.randrange(0, window_width - block_size) / block_size) * block_size
+    food_y = round(random.randrange(0, window_height - block_size) / block_size) * block_size
+
+    # Game loop
+    while not game_over:
+
+        while game_close:
+            game_window.fill(WHITE)
+            game_over_text = font_style.render("Game Over! Press Q-Quit or C-Play Again", True, RED)
+            game_window.blit(game_over_text, [window_width / 6, window_height / 3])
+            display_score(length_of_snake - 1)
+            pygame.display.update()
+
+            # Play again or quit
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q:
+                        game_over = True
+                        game_close = False
+                    if event.key == pygame.K_c:
+                        game_loop()
+
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x1_change = -block_size
+                    y1_change = 0
+                elif event.key == pygame.K_RIGHT:
+                    x1_change = block_size
+                    y1_change = 0
+                elif event.key == pygame.K_UP:
+                    y1_change = -block_size
+                    x1_change = 0
+                elif event.key == pygame.K_DOWN:
+                    y1_change = block_size
+                    x1_change = 0
+
+        # Check for collision with boundaries
+        if x1 >= window_width or x1 < 0 or y1 >= window_height or y1 < 0:
+            game_close = True
+
+        # Update snake position
+        x1 += x1_change
+        y1 += y1_change
+        game_window.fill(WHITE)
+        pygame.draw.rect(game_window, RED, [food_x, food_y, block_size, block_size])
+        snake_head = []
+        snake_head.append(x1)
+        snake_head.append(y1)
+        snake_list.append(snake_head)
+        if len(snake_list) > length_of_snake:
+            del snake_list[0]
+
+        # Check for snake self-collision
+        for x in snake_list[:-1]:
+            if x == snake_head:
+                game_close = True
+
+        draw_snake(block_size, snake_list)
+        display_score(length_of_snake - 1)
+
+        pygame.display.update()
+
+        # Check for food consumption
+        if x1 == food_x and y1 == food_y:
+            food_x = round(random.randrange(0, window_width - block_size) / block_size) * block_size
+            food_y = round(random.randrange(0, window_height - block_size) / block_size) * block_size
+            length_of_snake += 1
+
+        # Set game speed
+        clock.tick(snake_speed)
+
+    pygame.quit()
+
+
+# Create game window
+game_window = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption('Snake Game')
+
+# Start the game
+clock = pygame.time.Clock()
+game_loop()
+```
+
+这是一个简单的Python贪吃蛇游戏代码。在游戏中，你可以使用方向键来控制贪吃蛇的移动方向，目标是吃到食物并避免撞到边界或自身。游戏窗口的尺寸为800x600，贪吃蛇的方块大小为20x20。游戏会根据贪吃蛇的长度计分并显示在窗口上。游戏结束后，你可以按下Q键退出游戏或按下C键重新开始。
